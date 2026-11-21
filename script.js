@@ -24,6 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.slide-arrow.next')?.addEventListener('click', () => { show(current + 1); restart(); });
   document.querySelector('.slide-arrow.prev')?.addEventListener('click', () => { show(current - 1); restart(); });
   restart();
+  document.querySelectorAll('[data-comparison]').forEach(frame => {
+    const range = frame.querySelector('.compare-range');
+    const update = () => frame.style.setProperty('--reveal', `${range.value}%`);
+    range?.addEventListener('input', update);
+    update();
+  });
+  const revealTargets = document.querySelectorAll('.service-row, .gallery-card, .work-tile, .value-card, .contact-detail, .about-text, .about-stamp');
+  if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    }), { threshold: 0.12, rootMargin: '0px 0px -35px 0px' });
+    revealTargets.forEach((target, index) => {
+      target.classList.add('scroll-reveal');
+      target.style.transitionDelay = `${(index % 3) * 75}ms`;
+      observer.observe(target);
+    });
+  }
   const form = document.querySelector('.quote-form');
   form?.addEventListener('submit', event => {
     event.preventDefault();
